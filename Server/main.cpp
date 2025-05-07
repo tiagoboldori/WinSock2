@@ -9,7 +9,7 @@
 #define PORT "5150"
 
 int main() {
-	//initializing Winsock DLL
+	//initializing Winsock
 	WSAData wsaData;
 	WORD version = MAKEWORD(2, 2);
 	int isOk = WSAStartup(version, &wsaData);
