@@ -7,6 +7,34 @@
 #pragma comment (lib,"ws2_32.lib")
 
 #define PORT "5150"
+SOCKET socketPool[100];
+int cont = 0;
+
+void socketHandler(SOCKET clientSocket, sockaddr clientAddr) {
+	while (true) {
+		char buf[255];
+		ZeroMemory(&buf,255);
+		int bytesReceived = recv(clientSocket, buf, 255, 0);
+		if (bytesReceived <= 0) {
+			printf("Erro ao receber dados ou conexao fechada\n");
+			closesocket(clientSocket);
+			return;
+		}
+
+
+		char bufClient[255];
+		char clientName[255];
+		int clientSize = sizeof(clientAddr);
+		getnameinfo(&clientAddr, clientSize, bufClient, 255, clientName, 255, 0);
+
+		printf("Mensagem de %s: %s\n", bufClient, buf);
+		for(int i=0; i < cont; i++) {
+			if(socketPool[i] != clientSocket) {
+				send(socketPool[i], buf, bytesReceived, 0);
+			}
+		}
+	}	
+}
 
 int main() {
 	//initializing Winsock
@@ -48,7 +76,6 @@ int main() {
 	}
 	printf("Socket criada!\n");
 
-
 	//binding socket
 	iResult = bind(listenSocket, info->ai_addr, (int)info->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
@@ -58,32 +85,44 @@ int main() {
 	}
 	printf("Socket bindada\n");
 
-
 	//listening for connections
-	printf("Aguardando por conexoes\n");
-
 	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
 		printf("Erro ao escutar por conexoes\n");
 		closesocket(listenSocket);
 		WSACleanup();
 		return 1;
-	}
+	}	
+	printf("Socket escutando por conexoes\n");
+
 
 	//to receive client connections we need an extra socket
 	sockaddr clientAddr;
 	SOCKET clientSocket = INVALID_SOCKET;
 	int clientSize = sizeof(clientAddr);
 
-	clientSocket = accept(listenSocket, &clientAddr, &clientSize);
+	//accept func stops the main program execution and waits for incoming connections
 
-	if (clientSocket == INVALID_SOCKET) {
-		printf("Falha ao aceitar conexao\n");
-		closesocket(listenSocket);
-		WSACleanup();
-		return 1;
+	while (true) {
+		clientSocket = accept(listenSocket, &clientAddr, &clientSize);
+
+		if (clientSocket == INVALID_SOCKET) {
+			printf("Falha ao aceitar conexao\n");
+			closesocket(listenSocket);
+			WSACleanup();
+			return 1;
+		}
+		else {
+			socketPool[cont++] = clientSocket;
+			std::thread t(socketHandler,clientSocket,clientAddr);
+			t.detach();
+		}
+		clientSocket = INVALID_SOCKET;
 	}
+	
 	//at this point connections to the ip and port specified on the listenSocket should be accepted
 	//here i will add code to discover connected client's name and send messages between the server and the client
+	
+	/*
 	char buf[255];
 	char clientName[255];
 	ZeroMemory(&clientName, 255);
@@ -98,7 +137,6 @@ int main() {
 	}
 	std::cout << buf << " se conectou ao servidor\n";
 
-
 	char inputBuffer[255];
 	char recvBuffer[255];
 	char in;
@@ -110,12 +148,12 @@ int main() {
 	std::cin >> inputBuffer;
 	send(clientSocket, inputBuffer, 255, 0);
 
-
 	printf("Aguardando resposta do cliente\n");
 	recv(clientSocket, recvBuffer, 255, 0);
 	std::cout << recvBuffer;
 
 	std::cin >> in;
+	*/
 
 	return 0;
 }

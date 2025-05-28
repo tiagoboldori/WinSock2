@@ -1,6 +1,7 @@
 
 #include<iostream>
 #include<stdio.h>
+#include<thread>
 #include<WinSock2.h>
 #include<WS2tcpip.h>
 #pragma comment (lib,"ws2_32.lib")
@@ -8,6 +9,15 @@
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT "5150"
+void receiver(SOCKET sock) {
+	while (true) {
+		char buf[255];
+		recv(sock, buf, 255, 0);
+		printf("Mensagem recebida: %s\n", buf);
+
+	}
+}
+
 
 int main() {
 
@@ -64,14 +74,20 @@ int main() {
 	ZeroMemory(&rcvBuffer, 255);
 	ZeroMemory(&inputBuffer, 255);
 
+	/*
 	printf("Esperando resposta do servidor\n");
 	recv(clientSocket, rcvBuffer, 255, 0);
 	std::cout << rcvBuffer << "\n";
-
-
-	printf("Envie uma mensagem ao servidor\n");
-	std::cin >> inputBuffer;
-	send(clientSocket, inputBuffer, 255, 0);
+	*/
+	
+	while(true){
+		std::thread t(receiver, clientSocket);
+		t.detach();
+		printf("Envie uma mensagem ao servidor\n");
+		std::cin >> inputBuffer;
+		send(clientSocket, inputBuffer, 255, 0);
+	}
+	
 
 	std::cin >> in;
 	return 0;
