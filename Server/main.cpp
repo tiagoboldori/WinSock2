@@ -137,23 +137,6 @@ int main() {
 	}
 	std::cout << buf << " se conectou ao servidor\n";
 
-	char inputBuffer[255];
-	char recvBuffer[255];
-	char in;
-	ZeroMemory(&inputBuffer, 255);
-	ZeroMemory(&recvBuffer, 255);
-
-	printf("Digite uma mensagem para o cliente\n");
-
-	std::cin >> inputBuffer;
-	send(clientSocket, inputBuffer, 255, 0);
-
-	printf("Aguardando resposta do cliente\n");
-	recv(clientSocket, recvBuffer, 255, 0);
-	std::cout << recvBuffer;
-
-	std::cin >> in;
 	*/
-
 	return 0;
 }
