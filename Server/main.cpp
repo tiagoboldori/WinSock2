@@ -145,24 +145,5 @@ int main() {
 		clientSocket = INVALID_SOCKET;
 	}
 	
-	//at this point connections to the ip and port specified on the listenSocket should be accepted
-	//here i will add code to discover connected client's name and send messages between the server and the client
-	
-	/*
-	char buf[255];
-	char clientName[255];
-	ZeroMemory(&clientName, 255);
-	ZeroMemory(&buf, 255);
-
-	if (getnameinfo(&clientAddr, clientSize, buf, 255, clientName, 255, 0) != 0) {
-		closesocket(listenSocket);
-		closesocket(clientSocket);
-		WSACleanup();
-		printf("Nao pode resolver nome do client conectado\n");
-		return 1;
-	}
-	std::cout << buf << " se conectou ao servidor\n";
-
-	*/
 	return 0;
 }

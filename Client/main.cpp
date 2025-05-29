@@ -15,7 +15,6 @@ void receiver(SOCKET sock) {
 		recv(sock, buf, 255, 0);
 
 		printf("%s \n", buf);
-
 	}
 }
 
@@ -34,8 +33,6 @@ int main() {
 	}
 	printf("Winsock inicializado!\n");
 
-
-
 	//creating client socket so the client can connect to the server
 	addrinfo hints, * serverInfo;
 	ZeroMemory(&hints, sizeof(hints));
@@ -43,7 +40,6 @@ int main() {
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
-
 
 	//getting server info so we can connect
 	getaddrinfo(SERVER_IP, SERVER_PORT, &hints, &serverInfo);
@@ -64,8 +60,6 @@ int main() {
 		return 1;
 	}
 	printf("Conectado ao servidor!\n");
-
-
 
 	char rcvBuffer[255];
 	char inputBuffer[255];
@@ -88,7 +82,6 @@ int main() {
 		send(clientSocket, inputBuffer, 255, 0);
 	}
 	
-
 	std::cin >> in;
 	return 0;
 }
