@@ -10,27 +10,53 @@
 SOCKET socketPool[100];
 int cont = 0;
 
-void socketHandler(SOCKET clientSocket, sockaddr clientAddr) {
+static void socketHandler(SOCKET clientSocket, sockaddr clientAddr) {
 	while (true) {
-		char buf[255];
-		ZeroMemory(&buf,255);
-		int bytesReceived = recv(clientSocket, buf, 255, 0);
+		char receiveBuf[255];
+		ZeroMemory(&receiveBuf,255);
+		int bytesReceived = recv(clientSocket, receiveBuf, 255, 0);
 		if (bytesReceived <= 0) {
 			printf("Erro ao receber dados ou conexao fechada\n");
 			closesocket(clientSocket);
 			return;
 		}
-
-
 		char bufClient[255];
 		char clientName[255];
 		int clientSize = sizeof(clientAddr);
 		getnameinfo(&clientAddr, clientSize, bufClient, 255, clientName, 255, 0);
 
-		printf("Mensagem de %s: %s\n", bufClient, buf);
+		printf("Mensagem de %s: %s\n", bufClient, receiveBuf);
+
+		/*
+		montando os bytes para troca de mensagens:
+		bytes:
+		[0,1,2,3,4,5, ...,n]
+
+		nome do usuario ate 20 bytes
+		*/
+
+		int userNameSize = 20;
+		char sendBuf[255];
+		ZeroMemory(&sendBuf, 255);
+		for(int i =0 ; i < userNameSize; i++) {
+			if (bufClient[i] == '\0') {
+				userNameSize = i;
+				break;
+			}
+			sendBuf[i] = bufClient[i];
+		}
+		
+		sendBuf[userNameSize] = ':';
+		userNameSize++;
+
+		for(int i = userNameSize; i < 255; i++) {
+			sendBuf[i] = receiveBuf[i-userNameSize];
+		}
+		std::cout << sendBuf << std::endl;
+
 		for(int i=0; i < cont; i++) {
 			if(socketPool[i] != clientSocket) {
-				send(socketPool[i], buf, bytesReceived, 0);
+				send(socketPool[i], sendBuf, bytesReceived, 0);
 			}
 		}
 	}	

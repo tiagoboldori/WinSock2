@@ -13,15 +13,17 @@ void receiver(SOCKET sock) {
 	while (true) {
 		char buf[255];
 		recv(sock, buf, 255, 0);
-		printf("Mensagem recebida: %s\n", buf);
+
+		for (int i = 0; i < strlen(buf); i++) {
+			printf("%s", buf);
+		}
 
 	}
 }
 
 
 int main() {
-
-
+	
 	//initializing Winsock2
 	WSADATA wsaData;
 	WORD version;
