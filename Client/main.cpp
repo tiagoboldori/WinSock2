@@ -77,7 +77,7 @@ int main() {
 	while(true){
 		std::thread t(receiver, clientSocket);
 		t.detach();
-		printf("Envie uma mensagem ao servidor\n");
+		std::cout << "Voce: ";
 		std::cin >> inputBuffer;
 		send(clientSocket, inputBuffer, 255, 0);
 	}
